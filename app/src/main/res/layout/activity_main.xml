@@ -9,12 +9,14 @@
 
     <ListView
         android:id="@+id/food_list"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:divider="@color/design_default_color_background" />
+        android:divider="@color/design_default_color_background"
+        android:dividerHeight="4dp"
+        android:layout_margin="4dp"/>
 
     <TextView
         android:id="@+id/total_cost"

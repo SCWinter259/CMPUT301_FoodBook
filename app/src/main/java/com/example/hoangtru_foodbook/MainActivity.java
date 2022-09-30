@@ -24,13 +24,37 @@ public class MainActivity extends AppCompatActivity {
     ListView foodListView;
     TextView totalCostView;
 
+    // strictly for testing
+    Food bread = new Food();
+    Food wine = new Food();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // strictly for testing
+        bread.setName("bread");
+        bread.setDescription("makes you full");
+        bread.setBestBefore("2022-09-30");
+        bread.setLocation("Fridge");
+        bread.setCost(3);
+        bread.setCount(8);
+
+        wine.setName("wine");
+        wine.setDescription("makes you drunk");
+        wine.setBestBefore("2022-09-25");
+        wine.setLocation("Pantry");
+        wine.setCost(10);
+        wine.setCount(1);
+
         // This food book object will contain every info we need, so the activity won't look messy
         foodBook = new FoodBook();
+
+        // strictly for testing
+        foodBook.addFood(bread);
+        foodBook.addFood(wine);
+
         // foodList to pass around
         foodList = foodBook.getFoodList();
         // create Adapter
@@ -48,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 // bring us to InfoActivity
                 Intent intent = new Intent(view.getContext(), InfoActivity.class);
-                intent.putExtra("food", foodList.get(i));
+                foodBook.setPosition(i);
+                intent.putExtra("foodBook", foodBook);
                 startActivity(intent);
             }
         });
@@ -69,17 +94,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
-//    // handle button activities
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if (id == R.id.add_button) {
-//            // get user to the AddEditActivity
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
     // This method is announced by onClick attribute in the XML file (main_menu.xml)
     public void onAddClick(MenuItem item) {
