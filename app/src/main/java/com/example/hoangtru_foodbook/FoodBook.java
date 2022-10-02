@@ -11,7 +11,9 @@ public class FoodBook implements Serializable {
 
     // a method to calculate the total cost of the food book
     private void totalCostCalculator(ArrayList<Food> foodList) {
-
+        for(int i = 0; i < foodList.size(); i++) {
+            this.totalCost = this.totalCost + foodList.get(i).getCost();
+        }
     }
 
     // a method to add Food into the foodBook
@@ -39,6 +41,7 @@ public class FoodBook implements Serializable {
     }
 
     public Integer getTotalCost() {
+        this.totalCostCalculator(this.foodList);
         return this.totalCost;
     }
 }
