@@ -1,5 +1,7 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -43,5 +45,15 @@ public class FoodBook implements Serializable {
     public Integer getTotalCost() {
         this.totalCostCalculator(this.foodList);
         return this.totalCost;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String repr = "";
+        for(int i = 0; i < this.foodList.size(); i++) {
+            repr = repr + this.foodList.get(i) + " ";
+        }
+        return repr;
     }
 }

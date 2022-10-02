@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class FoodListAdapter extends ArrayAdapter {
             view = LayoutInflater.from(context).inflate(R.layout.content, parent, false);
         }
 
-        Food food = foodList.get(position);
+        Food food = this.foodList.get(position);
 
         TextView nameView = view.findViewById(R.id.content_name);
         TextView countView = view.findViewById(R.id.content_count);

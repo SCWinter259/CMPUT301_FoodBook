@@ -1,5 +1,7 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class Food {
@@ -56,5 +58,11 @@ public class Food {
 
     public void setCost(Integer cost) {
         this.cost = cost;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.name;
     }
 }
