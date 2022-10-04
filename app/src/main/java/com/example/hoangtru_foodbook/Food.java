@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 
-public class Food {
+public class Food implements Serializable{
     String name;
     String description;
     String bestBefore;

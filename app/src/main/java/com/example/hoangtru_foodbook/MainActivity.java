@@ -62,10 +62,11 @@ public class MainActivity extends AppCompatActivity {
         foodListAdapter = new FoodListAdapter(this, foodList);
         // create view (main view of this activity)
         foodListView = findViewById(R.id.food_list);
+        // create view for total cost (actually set footer view for listview)
+        totalCostView = (TextView) getLayoutInflater().inflate(R.layout.main_footer, foodListView, false);
+        foodListView.addFooterView(totalCostView);
         // set Adapter for the view
         foodListView.setAdapter(foodListAdapter);
-        // create view for total cost
-        totalCostView = findViewById(R.id.total_cost);
 
         // Set what happens when we click an Item in ListView
         foodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

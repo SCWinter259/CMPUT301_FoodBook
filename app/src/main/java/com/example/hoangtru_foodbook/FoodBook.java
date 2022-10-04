@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class FoodBook implements Serializable {
     private ArrayList<Food> foodList = new ArrayList<>();
-    private Integer position;
+    private Integer position;       // to indicate which item in the list is being selected
     private Integer totalCost = 0;
     private String locations[] = {"Pantry", "Freezer", "Fridge"};
 

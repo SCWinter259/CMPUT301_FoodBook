@@ -20,15 +20,8 @@
             android:layout_height="match_parent"
             android:divider="@color/design_default_color_background"
             android:dividerHeight="4dp"
-            android:layout_margin="4dp"/>
-
-        <TextView
-            android:id="@+id/total_cost"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_margin="8dp"
-            android:text="Total Cost: "/>
+            android:layout_margin="4dp"
+            tools:listfooter="@layout/main_footer"/>
 
     </LinearLayout>
 
