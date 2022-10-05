@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 public class InfoActivity extends AppCompatActivity {
@@ -58,8 +58,24 @@ public class InfoActivity extends AppCompatActivity {
         countView.setText(count);
         costView.setText(cost);
     }
+    // create an action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // R.menu.main_menu is a reference to an xml file named main_menu.xml which should be inside your res/menu directory.
+        // If you don't have res/menu, just create a Android resource directory named "menu" inside res
+        getMenuInflater().inflate(R.menu.info_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     public void onEditClick(MenuItem item) {
+        Intent intent = new Intent(this, AddEditActivity.class);
+        intent.putExtra("foodBook", foodBook);
+        item.setIntent(intent);
+        this.startActivity(intent);
+    }
 
+    public void onDeleteClick(View view) {
+        foodBook.deleteFood();
+        finish();
     }
 }

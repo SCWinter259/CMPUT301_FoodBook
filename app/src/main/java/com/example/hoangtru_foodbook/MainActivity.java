@@ -1,5 +1,6 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -96,11 +97,17 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    // This method is announced by onClick attribute in the XML file (main_menu.xml)
-    public void onAddClick(MenuItem item) {
-        // Bring us to AddEditActivity
-        Intent intent = new Intent(this, AddEditActivity.class);
-        item.setIntent(intent);
-        this.startActivity(intent);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.add_button) {
+            Intent intent = new Intent(this, AddEditActivity.class);
+            foodBook.setPosition(-1);
+            intent.putExtra("foodBook", foodBook);
+            item.setIntent(intent);
+            this.startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

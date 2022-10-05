@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class FoodBook implements Serializable {
     private ArrayList<Food> foodList = new ArrayList<>();
-    private Integer position;       // to indicate which item in the list is being selected
+    private Integer position;       // to indicate which item in the list is being selected (-1 means none)
     private Integer totalCost = 0;
     private String locations[] = {"Pantry", "Freezer", "Fridge"};
 
@@ -28,12 +28,22 @@ public class FoodBook implements Serializable {
         this.foodList.remove(this.position);
     }
 
+    public void replaceFood(Food food) {
+        foodList.set(this.position, food);
+    }
+
     public void setPosition(Integer position) {
         this.position = position;
     }
 
+    // get food based on the already set position attribute
     public Food getFood() {
-        return this.foodList.get(this.position);
+        if(this.position == -1) {
+            return null;
+        }
+        else {
+            return this.foodList.get(this.position);
+        }
     }
 
     public String[] getLocations() {return this.locations;}
