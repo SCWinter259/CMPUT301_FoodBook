@@ -74,7 +74,6 @@ public class InfoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent intent = new Intent(this, AddEditActivity.class);
         intent.putExtra("foodBook", foodBook);
-        item.setIntent(intent);
         this.startActivity(intent);
         return super.onOptionsItemSelected(item);
     }

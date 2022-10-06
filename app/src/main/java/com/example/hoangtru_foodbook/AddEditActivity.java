@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,13 +50,6 @@ public class AddEditActivity extends AppCompatActivity {
         editCost = findViewById(R.id.edit_cost);
         cancelButton = findViewById(R.id.edit_cancel);
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
         // get the locations for spinner
         String[] locations = foodBook.getLocations();
 
@@ -81,8 +75,8 @@ public class AddEditActivity extends AppCompatActivity {
             }
             editLocation.setSelection(pos);
 
-            editCount.setText(food.getCount());
-            editCost.setText(food.getCost());
+            editCount.setText(food.getCount().toString());
+            editCost.setText(food.getCost().toString());
         }
         else {
             food = new Food();
@@ -104,7 +98,6 @@ public class AddEditActivity extends AppCompatActivity {
                 food.setLocation(adapterView.getItemAtPosition(0).toString());
             }
         });
-
         // parseInt require try-catch
         try{
             Integer count = Integer.parseInt(editCount.getText().toString());
@@ -114,6 +107,22 @@ public class AddEditActivity extends AppCompatActivity {
         } catch(NumberFormatException ex){ // handle your exception
             ex.printStackTrace();
         }
+
+        // edit the foodBook
+        if(foodBook.getFood() == null) {
+            foodBook.addFood(food);
+        }
+        else {
+            foodBook.replaceFood(food);
+        }
+
+        // control cancel button
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     // create an action bar button
@@ -127,13 +136,15 @@ public class AddEditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(foodBook.getFood() == null) {
-            foodBook.addFood(food);
+        int id = item.getItemId();
+
+        if(id == R.id.OK_button) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("foodBook", foodBook);
+            setResult(1, intent);
+            Log.d("in add/edit", "executed");
+            finish();
         }
-        else {
-            foodBook.replaceFood(food);
-        }
-        finish();
         return super.onOptionsItemSelected(item);
     }
 }

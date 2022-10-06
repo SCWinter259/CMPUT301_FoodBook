@@ -139,8 +139,8 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AddEditActivity.class);
             foodBook.setPosition(-1);
             intent.putExtra("foodBook", foodBook);
-            item.setIntent(intent);
-            this.startActivity(intent);
+            activityResultLauncher.launch(intent);
+            // this.startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
