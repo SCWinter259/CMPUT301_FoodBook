@@ -13,6 +13,7 @@ public class FoodBook implements Serializable {
 
     // a method to calculate the total cost of the food book
     private void totalCostCalculator(ArrayList<Food> foodList) {
+        this.totalCost = 0;
         for(int i = 0; i < foodList.size(); i++) {
             this.totalCost = this.totalCost + foodList.get(i).getCost();
         }
@@ -25,11 +26,11 @@ public class FoodBook implements Serializable {
 
     // a method to delete Food out of the foodBook
     public void deleteFood() {
-        this.foodList.remove(this.position);
+        this.foodList.remove(this.foodList.get(this.position));
     }
 
     public void replaceFood(Food food) {
-        foodList.set(this.position, food);
+        this.foodList.set(this.position, food);
     }
 
     public void setPosition(Integer position) {

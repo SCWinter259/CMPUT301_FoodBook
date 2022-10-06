@@ -1,5 +1,6 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,6 +60,7 @@ public class InfoActivity extends AppCompatActivity {
         countView.setText(count);
         costView.setText(cost);
     }
+
     // create an action bar button
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -67,15 +70,22 @@ public class InfoActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void onEditClick(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent intent = new Intent(this, AddEditActivity.class);
         intent.putExtra("foodBook", foodBook);
         item.setIntent(intent);
         this.startActivity(intent);
+        return super.onOptionsItemSelected(item);
     }
 
     public void onDeleteClick(View view) {
         foodBook.deleteFood();
+        Log.d("in foodBook: ", foodBook.toString());
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("foodBook", foodBook);
+        setResult(1, intent);
+        // startActivity(intent);
         finish();
     }
 }

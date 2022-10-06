@@ -1,5 +1,10 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,6 +35,33 @@ public class MainActivity extends AppCompatActivity {
     // strictly for testing
     Food bread = new Food();
     Food wine = new Food();
+
+    // create activity result launcher if you want to get data back from subsequent activities
+    // we do this because startActivityForResult() is deprecated.
+    ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == 1) {
+                        Intent intent = result.getData();
+                        if(intent != null) {
+                            // extract data
+                            foodBook = (FoodBook) intent.getSerializableExtra("foodBook");
+                            foodList = foodBook.getFoodList();
+                        }
+                    }
+                    // basically recreate all views
+                    foodListAdapter = new FoodListAdapter(MainActivity.this, foodList);
+                    foodListView.setAdapter(foodListAdapter);
+                    SpannableString costString = new SpannableString(totalCostView.getText().subSequence(0, 11) + foodBook.getTotalCost().toString());
+                    StyleSpan boldItalicSpan = new StyleSpan(Typeface.BOLD_ITALIC);
+                    costString.setSpan(boldItalicSpan, 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    totalCostView.setText(costString);
+                    Log.d("foodBook in main", foodBook.toString());
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +110,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(view.getContext(), InfoActivity.class);
                 foodBook.setPosition(i);
                 intent.putExtra("foodBook", foodBook);
-                startActivity(intent);
+                activityResultLauncher.launch(intent);
+                // startActivity(intent)
             }
         });
 

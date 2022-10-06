@@ -1,5 +1,6 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -124,8 +125,8 @@ public class AddEditActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    // handle the OK button on the activity bar
-    public void onOKClick(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(foodBook.getFood() == null) {
             foodBook.addFood(food);
         }
@@ -133,5 +134,6 @@ public class AddEditActivity extends AppCompatActivity {
             foodBook.replaceFood(food);
         }
         finish();
+        return super.onOptionsItemSelected(item);
     }
 }
