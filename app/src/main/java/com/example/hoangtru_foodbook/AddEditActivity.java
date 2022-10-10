@@ -31,6 +31,7 @@ public class AddEditActivity extends AppCompatActivity {
     EditText editCount;
     EditText editCost;
     Button cancelButton;
+    String location;    // special string for food location
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,39 +83,18 @@ public class AddEditActivity extends AppCompatActivity {
             food = new Food();
         }
 
-        // getting input and set them to food object
-        food.setName(editName.getText().toString());
-        food.setDescription(editDescription.getText().toString());
-        food.setBestBefore(editBestBefore.getText().toString());
         // control spinner action - set location
         editLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                food.setLocation(adapterView.getItemAtPosition(i).toString());
+                location = adapterView.getItemAtPosition(i).toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                food.setLocation(adapterView.getItemAtPosition(0).toString());
+                location = adapterView.getItemAtPosition(0).toString();
             }
         });
-        // parseInt require try-catch
-        try{
-            Integer count = Integer.parseInt(editCount.getText().toString());
-            Integer cost = Integer.parseInt(editCost.getText().toString());
-            food.setCount(count);
-            food.setCost(cost);
-        } catch(NumberFormatException ex){ // handle your exception
-            ex.printStackTrace();
-        }
-
-        // edit the foodBook
-        if(foodBook.getFood() == null) {
-            foodBook.addFood(food);
-        }
-        else {
-            foodBook.replaceFood(food);
-        }
 
         // control cancel button
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -139,9 +119,36 @@ public class AddEditActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.OK_button) {
-            Intent intent = new Intent(this, MainActivity.class);
+            // getting input and set them to food object
+            food.setName(editName.getText().toString());
+            food.setDescription(editDescription.getText().toString());
+            food.setBestBefore(editBestBefore.getText().toString());
+            food.setLocation(location);
+            // parseInt require try-catch
+            try{
+                Integer count = Integer.valueOf(editCount.getText().toString());
+                Integer cost = Integer.valueOf(editCost.getText().toString());
+                food.setCount(count);
+                food.setCost(cost);
+            } catch(NumberFormatException ex){ // handle your exception
+                ex.printStackTrace();
+            }
+
+            Intent intent;
+            // edit the foodBook
+            if(foodBook.getFood() == null) {
+                foodBook.addFood(food);
+                intent = new Intent(this, MainActivity.class);
+            }
+            else {
+                foodBook.replaceFood(food);
+                intent = new Intent(this, InfoActivity.class);
+            }
+
+            // Launch Intent
+            Log.d("in OK  button", foodBook.toString());
             intent.putExtra("foodBook", foodBook);
-            setResult(1, intent);
+            this.setResult(1, intent);
             Log.d("in add/edit", "executed");
             finish();
         }

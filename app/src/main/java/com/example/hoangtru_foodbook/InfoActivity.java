@@ -1,5 +1,9 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,10 +18,64 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 public class InfoActivity extends AppCompatActivity {
     FoodBook foodBook;
     Food food;
+
+    // create activity result launcher if you want to get data back from subsequent activities
+    // we do this because startActivityForResult() is deprecated.
+    ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == 1) {
+                        Log.d("in onActivityResult 1", "result code correct");
+                        Intent intent = result.getData();
+                        if(intent != null) {
+                            // extract data
+                            Log.d("in onActivityResult 2", "intent not null");
+                            foodBook = (FoodBook) intent.getSerializableExtra("foodBook");
+                            food = foodBook.getFood();
+
+                            // find the views
+                            TextView nameView = findViewById(R.id.info_name);
+                            TextView descriptionView = findViewById(R.id.info_description);
+                            TextView bestBeforeView = findViewById(R.id.info_bestBefore);
+                            TextView locationView = findViewById(R.id.info_location);
+                            TextView countView = findViewById(R.id.info_count);
+                            TextView costView = findViewById(R.id.info_cost);
+
+                            // format the view
+                            SpannableString name = new SpannableString(nameView.getText().subSequence(0, 6) + food.getName());
+                            SpannableString description = new SpannableString(descriptionView.getText().subSequence(0, 13) + food.getDescription());
+                            SpannableString bestBefore = new SpannableString(bestBeforeView.getText().subSequence(0, 13) + food.getBestBefore());
+                            SpannableString location = new SpannableString(locationView.getText().subSequence(0, 10) + food.getLocation());
+                            SpannableString count = new SpannableString(countView.getText().subSequence(0, 7) + food.getCount().toString());
+                            SpannableString cost = new SpannableString(costView.getText().subSequence(0, 11) + food.getCost().toString());
+
+                            StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
+
+                            name.setSpan(boldSpan, 0, 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            description.setSpan(boldSpan, 0, 11, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            bestBefore.setSpan(boldSpan, 0, 11, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            location.setSpan(boldSpan, 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            count.setSpan(boldSpan, 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            cost.setSpan(boldSpan, 0, 9, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                            nameView.setText(name);
+                            descriptionView.setText(description);
+                            bestBeforeView.setText(bestBefore);
+                            locationView.setText(location);
+                            countView.setText(count);
+                            costView.setText(cost);
+                        }
+                    }
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +95,12 @@ public class InfoActivity extends AppCompatActivity {
         TextView costView = findViewById(R.id.info_cost);
 
         // format the view
-        SpannableString name = new SpannableString(nameView.getText() + food.getName());
-        SpannableString description = new SpannableString(descriptionView.getText() + food.getDescription());
-        SpannableString bestBefore = new SpannableString(bestBeforeView.getText() + food.getBestBefore());
-        SpannableString location = new SpannableString(locationView.getText() + food.getLocation());
-        SpannableString count = new SpannableString(countView.getText() + food.getCount().toString());
-        SpannableString cost = new SpannableString(costView.getText() + food.getCost().toString());
+        SpannableString name = new SpannableString(nameView.getText().subSequence(0, 6) + food.getName());
+        SpannableString description = new SpannableString(descriptionView.getText().subSequence(0, 13) + food.getDescription());
+        SpannableString bestBefore = new SpannableString(bestBeforeView.getText().subSequence(0, 13) + food.getBestBefore());
+        SpannableString location = new SpannableString(locationView.getText().subSequence(0, 10) + food.getLocation());
+        SpannableString count = new SpannableString(countView.getText().subSequence(0, 7) + food.getCount().toString());
+        SpannableString cost = new SpannableString(costView.getText().subSequence(0, 11) + food.getCost().toString());
 
         StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
 
@@ -51,7 +109,7 @@ public class InfoActivity extends AppCompatActivity {
         bestBefore.setSpan(boldSpan, 0, 11, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         location.setSpan(boldSpan, 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         count.setSpan(boldSpan, 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        cost.setSpan(boldSpan, 0, 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        cost.setSpan(boldSpan, 0, 9, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         nameView.setText(name);
         descriptionView.setText(description);
@@ -59,6 +117,7 @@ public class InfoActivity extends AppCompatActivity {
         locationView.setText(location);
         countView.setText(count);
         costView.setText(cost);
+
     }
 
     // create an action bar button
@@ -72,9 +131,21 @@ public class InfoActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent intent = new Intent(this, AddEditActivity.class);
-        intent.putExtra("foodBook", foodBook);
-        this.startActivity(intent);
+        int id = item.getItemId();
+
+        if(id == R.id.edit_button) {
+            Intent intent = new Intent(this, AddEditActivity.class);
+            intent.putExtra("foodBook", foodBook);
+            activityResultLauncher.launch(intent);
+        }
+        else if (id == android.R.id.home) {
+            Log.d("back button", foodBook.toString());
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("foodBook", foodBook);
+            setResult(1, intent);
+            finish();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -84,7 +155,6 @@ public class InfoActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("foodBook", foodBook);
         setResult(1, intent);
-        // startActivity(intent);
         finish();
     }
 }

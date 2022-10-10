@@ -44,21 +44,23 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == 1) {
+                        Log.d("in onActivityResult 1", "result code correct");
                         Intent intent = result.getData();
                         if(intent != null) {
                             // extract data
+                            Log.d("in onActivityResult 2", "intent not null");
                             foodBook = (FoodBook) intent.getSerializableExtra("foodBook");
                             foodList = foodBook.getFoodList();
+                            Log.d("foodBook in main", foodBook.toString());
+                            // basically recreate all views
+                            foodListAdapter = new FoodListAdapter(MainActivity.this, foodList);
+                            foodListView.setAdapter(foodListAdapter);
+                            SpannableString costString = new SpannableString(totalCostView.getText().subSequence(0, 11) + foodBook.getTotalCost().toString());
+                            StyleSpan boldItalicSpan = new StyleSpan(Typeface.BOLD_ITALIC);
+                            costString.setSpan(boldItalicSpan, 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            totalCostView.setText(costString);
                         }
                     }
-                    // basically recreate all views
-                    foodListAdapter = new FoodListAdapter(MainActivity.this, foodList);
-                    foodListView.setAdapter(foodListAdapter);
-                    SpannableString costString = new SpannableString(totalCostView.getText().subSequence(0, 11) + foodBook.getTotalCost().toString());
-                    StyleSpan boldItalicSpan = new StyleSpan(Typeface.BOLD_ITALIC);
-                    costString.setSpan(boldItalicSpan, 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    totalCostView.setText(costString);
-                    Log.d("foodBook in main", foodBook.toString());
                 }
             }
     );
@@ -102,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
         // set Adapter for the view
         foodListView.setAdapter(foodListAdapter);
 
+        Log.d("in onCreate", foodBook.toString());
+
         // Set what happens when we click an Item in ListView
         foodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -111,12 +115,11 @@ public class MainActivity extends AppCompatActivity {
                 foodBook.setPosition(i);
                 intent.putExtra("foodBook", foodBook);
                 activityResultLauncher.launch(intent);
-                // startActivity(intent)
             }
         });
 
         // Make part of total cost bold and italic
-        SpannableString costString = new SpannableString(totalCostView.getText() + foodBook.getTotalCost().toString());
+        SpannableString costString = new SpannableString(totalCostView.getText().subSequence(0, 11) + foodBook.getTotalCost().toString());
         StyleSpan boldItalicSpan = new StyleSpan(Typeface.BOLD_ITALIC);
         costString.setSpan(boldItalicSpan, 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         totalCostView.setText(costString);
@@ -140,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
             foodBook.setPosition(-1);
             intent.putExtra("foodBook", foodBook);
             activityResultLauncher.launch(intent);
-            // this.startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

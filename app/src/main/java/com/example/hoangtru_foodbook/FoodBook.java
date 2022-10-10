@@ -1,5 +1,7 @@
 package com.example.hoangtru_foodbook;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
@@ -13,9 +15,10 @@ public class FoodBook implements Serializable {
 
     // a method to calculate the total cost of the food book
     private void totalCostCalculator(ArrayList<Food> foodList) {
+        Log.d("in totalCostCalculator", this.toString());
         this.totalCost = 0;
         for(int i = 0; i < foodList.size(); i++) {
-            this.totalCost = this.totalCost + foodList.get(i).getCost();
+            this.totalCost = this.totalCost + (foodList.get(i).getCost() * foodList.get(i).getCount());
         }
     }
 
