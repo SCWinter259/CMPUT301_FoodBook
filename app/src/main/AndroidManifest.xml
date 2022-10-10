@@ -18,11 +18,11 @@
             android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".AddEditActivity"
-            android:exported="false"
-            android:parentActivityName=".InfoActivity"/>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

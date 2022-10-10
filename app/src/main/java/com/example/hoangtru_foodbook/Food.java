@@ -1,13 +1,14 @@
 package com.example.hoangtru_foodbook;
 
-import java.io.Serializable;
-import java.util.Date;
+import androidx.annotation.NonNull;
 
-public class Food implements Serializable {
+import java.io.Serializable;
+
+public class Food implements Serializable{
     String name;
     String description;
     String bestBefore;
-    Location location;
+    String location;
     Integer count;
     Integer cost;
 
@@ -23,7 +24,7 @@ public class Food implements Serializable {
         return this.bestBefore;
     }
 
-    public Location getLocation() {
+    public String getLocation() {
         return this.location;
     }
 
@@ -47,7 +48,7 @@ public class Food implements Serializable {
         this.bestBefore = bestBefore;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 
@@ -57,5 +58,11 @@ public class Food implements Serializable {
 
     public void setCost(Integer cost) {
         this.cost = cost;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.name;
     }
 }

@@ -4,6 +4,5 @@
     <item
         android:id="@+id/add_button"
         android:title="ADD"
-        app:showAsAction="always"
-        android:onClick="onAddClick" />
+        app:showAsAction="always" />
 </menu>

@@ -1,13 +1,17 @@
 package com.example.hoangtru_foodbook;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -18,6 +22,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class AddEditActivity extends AppCompatActivity {
+    FoodBook foodBook;
     Food food;
     EditText editName;
     EditText editDescription;
@@ -25,57 +30,74 @@ public class AddEditActivity extends AppCompatActivity {
     Spinner editLocation;
     EditText editCount;
     EditText editCost;
-    Button cancel;
-    Fridge fridge = new Fridge();
-    Freezer freezer = new Freezer();
-    Pantry pantry = new Pantry();
-    ArrayList<Location> locations = new ArrayList<>();
-    ArrayAdapter<CharSequence> locationsAdapter;
-    private boolean edit;
+    Button cancelButton;
+    String location;    // special string for food location
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit);
 
-        // create the spinner
-        locations.add(fridge);
-        locations.add(freezer);
-        locations.add(pantry);
+        // get the intent
+        foodBook = (FoodBook) getIntent().getSerializableExtra("foodBook");
+        food = foodBook.getFood();
 
-        locationsAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, locations);
-        locationsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        editLocation.setAdapter(locationsAdapter);
-
-        // create views
+        // find the views
         editName = findViewById(R.id.edit_name);
         editDescription = findViewById(R.id.edit_description);
         editBestBefore = findViewById(R.id.edit_bestBefore);
         editLocation = findViewById(R.id.edit_location);
         editCount = findViewById(R.id.edit_count);
         editCost = findViewById(R.id.edit_cost);
-        cancel = findViewById(R.id.edit_cancel);
+        cancelButton = findViewById(R.id.edit_cancel);
 
+        // get the locations for spinner
+        String[] locations = foodBook.getLocations();
 
-        Intent intent = getIntent();
+        // create adapter for the spinner
+        ArrayAdapter locationsAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, locations);
+        locationsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editLocation.setAdapter(locationsAdapter);
 
-        if(intent.hasExtra("food")) {
-            this.edit = true;
-            // set the already chosen values
-            food = (Food) intent.getSerializableExtra("food");
+        // set info into fields if a food is selected
+        if(food != null) {
+            // set info of selected food
             editName.setText(food.getName());
             editDescription.setText(food.getDescription());
-            editBestBefore.setText(food.getBestBefore().toString());
-            Location location = food.getLocation();
-            editLocation.setSelection(locationsAdapter.getPosition(location.toString()));
-            editCount.setText(food.getCount());
-            editCost.setText(food.getCost());
+            editBestBefore.setText(food.getBestBefore());
+
+            // determine the selected location
+            int pos = 0;
+            for(int i = 0; i < locations.length; i++) {
+                if(food.getLocation().equals(locations[i])) {
+                    pos = i;
+                    break;
+                }
+            }
+            editLocation.setSelection(pos);
+
+            editCount.setText(food.getCount().toString());
+            editCost.setText(food.getCost().toString());
         }
         else {
-            this.edit = false;
+            food = new Food();
         }
 
-        cancel.setOnClickListener(new View.OnClickListener() {
+        // control spinner action - set location
+        editLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                location = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                location = adapterView.getItemAtPosition(0).toString();
+            }
+        });
+
+        // control cancel button
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
@@ -83,24 +105,53 @@ public class AddEditActivity extends AppCompatActivity {
         });
     }
 
-    public void onOKClick(MenuItem item) {
-        if(this.edit) {
-            String name = editName.getText().toString();
-            String description = editDescription.getText().toString();
-            String bestBefore = editBestBefore.getText().toString();
-            Location location = locations.get(editLocation.getCount());
-            Integer count = Integer.parseInt(editCount.getText().toString());
-            Integer cost = Integer.parseInt(editCost.getText().toString());
+    // create an action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // R.menu.main_menu is a reference to an xml file named main_menu.xml which should be inside your res/menu directory.
+        // If you don't have res/menu, just create a Android resource directory named "menu" inside res
+        getMenuInflater().inflate(R.menu.edit_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-            food.setName(name);
-            food.setDescription(description);
-            food.setBestBefore(bestBefore);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.OK_button) {
+            // getting input and set them to food object
+            food.setName(editName.getText().toString());
+            food.setDescription(editDescription.getText().toString());
+            food.setBestBefore(editBestBefore.getText().toString());
             food.setLocation(location);
-            food.setCount(count);
-            food.setCost(cost);
-        }
-        else {
+            // parseInt require try-catch
+            try{
+                Integer count = Integer.valueOf(editCount.getText().toString());
+                Integer cost = Integer.valueOf(editCost.getText().toString());
+                food.setCount(count);
+                food.setCost(cost);
+            } catch(NumberFormatException ex){ // handle your exception
+                ex.printStackTrace();
+            }
 
+            Intent intent;
+            // edit the foodBook
+            if(foodBook.getFood() == null) {
+                foodBook.addFood(food);
+                intent = new Intent(this, MainActivity.class);
+            }
+            else {
+                foodBook.replaceFood(food);
+                intent = new Intent(this, InfoActivity.class);
+            }
+
+            // Launch Intent
+            Log.d("in OK  button", foodBook.toString());
+            intent.putExtra("foodBook", foodBook);
+            this.setResult(1, intent);
+            Log.d("in add/edit", "executed");
+            finish();
         }
+        return super.onOptionsItemSelected(item);
     }
 }

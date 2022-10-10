@@ -7,21 +7,22 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ListView
-        android:id="@+id/food_list"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:divider="@color/design_default_color_background" />
-
-    <TextView
-        android:id="@+id/total_cost"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/food_list"
-        android:text="Total Cost: "/>
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/food_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@color/design_default_color_background"
+            android:dividerHeight="4dp"
+            android:layout_margin="4dp"
+            tools:listfooter="@layout/main_footer"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
