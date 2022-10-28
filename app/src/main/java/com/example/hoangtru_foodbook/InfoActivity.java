@@ -20,9 +20,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class InfoActivity extends AppCompatActivity {
     FoodBook foodBook;
     Food food;
+    FirebaseFirestore db;
 
     // create activity result launcher if you want to get data back from subsequent activities
     // we do this because startActivityForResult() is deprecated.
@@ -81,6 +84,8 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
+
+        db = FirebaseFirestore.getInstance();
 
         // get information from the intent
         foodBook = (FoodBook) getIntent().getSerializableExtra("foodBook");
