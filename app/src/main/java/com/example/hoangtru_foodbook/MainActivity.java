@@ -6,6 +6,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -23,6 +24,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,10 +39,11 @@ public class MainActivity extends AppCompatActivity {
     FoodListAdapter foodListAdapter;
     ListView foodListView;
     TextView totalCostView;
+    FirebaseFirestore db;
 
     // strictly for testing
-    Food bread = new Food();
-    Food wine = new Food();
+//    Food bread = new Food();
+//    Food wine = new Food();
 
     // create activity result launcher if you want to get data back from subsequent activities
     // we do this because startActivityForResult() is deprecated.
@@ -71,26 +80,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // strictly for testing
-        bread.setName("bread");
-        bread.setDescription("makes you full");
-        bread.setBestBefore("2022-09-30");
-        bread.setLocation("Fridge");
-        bread.setCost(3);
-        bread.setCount(8);
+//        bread.setName("bread");
+//        bread.setDescription("makes you full");
+//        bread.setBestBefore("2022-09-30");
+//        bread.setLocation("Fridge");
+//        bread.setCost(3);
+//        bread.setCount(8);
+//
+//        wine.setName("wine");
+//        wine.setDescription("makes you drunk");
+//        wine.setBestBefore("2022-09-25");
+//        wine.setLocation("Pantry");
+//        wine.setCost(10);
+//        wine.setCount(1);
 
-        wine.setName("wine");
-        wine.setDescription("makes you drunk");
-        wine.setBestBefore("2022-09-25");
-        wine.setLocation("Pantry");
-        wine.setCost(10);
-        wine.setCount(1);
+        db = FirebaseFirestore.getInstance();
+        final CollectionReference collection = db.collection("Food Book");
 
         // This food book object will contain every info we need, so the activity won't look messy
         foodBook = new FoodBook();
 
         // strictly for testing
-        foodBook.addFood(bread);
-        foodBook.addFood(wine);
+//        foodBook.addFood(bread);
+//        foodBook.addFood(wine);
 
         // foodList to pass around
         foodList = foodBook.getFoodList();
@@ -103,6 +115,36 @@ public class MainActivity extends AppCompatActivity {
         foodListView.addFooterView(totalCostView);
         // set Adapter for the view
         foodListView.setAdapter(foodListAdapter);
+
+        // load data from database to app
+        collection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                // clear the old list
+                foodList.clear();
+                assert value != null;
+                for(QueryDocumentSnapshot document: value) {
+                    String name = document.getId();
+                    String description  = (String) document.getData().get("Description");
+                    String bestBefore = (String) document.getData().get("Best Before");
+                    String location = (String) document.getData().get("Location");
+                    String count = (String) document.getData().get("Count");
+                    String cost = (String) document.getData().get("Cost");
+                    Food food = new Food();
+                    food.setName(name);
+                    food.setDescription(description);
+                    food.setBestBefore(bestBefore);
+                    food.setLocation(location);
+                    assert count != null;
+                    food.setCount(Integer.valueOf(count));
+                    assert cost != null;
+                    food.setCost(Integer.valueOf(cost));
+                    foodBook.addFood(food);
+                }
+                foodList = foodBook.getFoodList();
+                foodListAdapter.notifyDataSetChanged();
+            }
+        });
 
         Log.d("in onCreate", foodBook.toString());
 
