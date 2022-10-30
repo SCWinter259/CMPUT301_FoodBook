@@ -25,7 +25,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class InfoActivity extends AppCompatActivity {
     FoodBook foodBook;
     Food food;
-    FirebaseFirestore db;
 
     // create activity result launcher if you want to get data back from subsequent activities
     // we do this because startActivityForResult() is deprecated.
@@ -35,11 +34,9 @@ public class InfoActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == 1) {
-                        Log.d("in onActivityResult 1", "result code correct");
                         Intent intent = result.getData();
                         if(intent != null) {
                             // extract data
-                            Log.d("in onActivityResult 2", "intent not null");
                             foodBook = (FoodBook) intent.getSerializableExtra("foodBook");
                             food = foodBook.getFood();
 
@@ -84,8 +81,6 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-
-        db = FirebaseFirestore.getInstance();
 
         // get information from the intent
         foodBook = (FoodBook) getIntent().getSerializableExtra("foodBook");
@@ -144,7 +139,6 @@ public class InfoActivity extends AppCompatActivity {
             activityResultLauncher.launch(intent);
         }
         else if (id == android.R.id.home) {
-            Log.d("back button", foodBook.toString());
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("foodBook", foodBook);
             setResult(1, intent);
@@ -156,7 +150,6 @@ public class InfoActivity extends AppCompatActivity {
 
     public void onDeleteClick(View view) {
         foodBook.deleteFood();
-        Log.d("in foodBook: ", foodBook.toString());
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("foodBook", foodBook);
         setResult(1, intent);

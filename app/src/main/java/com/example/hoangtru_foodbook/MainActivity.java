@@ -32,6 +32,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     FoodBook foodBook;
@@ -41,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
     TextView totalCostView;
     FirebaseFirestore db;
 
-    // strictly for testing
-//    Food bread = new Food();
-//    Food wine = new Food();
-
     // create activity result launcher if you want to get data back from subsequent activities
     // we do this because startActivityForResult() is deprecated.
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -53,14 +51,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == 1) {
-                        Log.d("in onActivityResult 1", "result code correct");
                         Intent intent = result.getData();
                         if(intent != null) {
                             // extract data
-                            Log.d("in onActivityResult 2", "intent not null");
                             foodBook = (FoodBook) intent.getSerializableExtra("foodBook");
                             foodList = foodBook.getFoodList();
-                            Log.d("foodBook in main", foodBook.toString());
                             // basically recreate all views
                             foodListAdapter = new FoodListAdapter(MainActivity.this, foodList);
                             foodListView.setAdapter(foodListAdapter);
@@ -68,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                             StyleSpan boldItalicSpan = new StyleSpan(Typeface.BOLD_ITALIC);
                             costString.setSpan(boldItalicSpan, 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             totalCostView.setText(costString);
+                            MainActivity.this.update();
                         }
                     }
                 }
@@ -79,30 +75,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // strictly for testing
-//        bread.setName("bread");
-//        bread.setDescription("makes you full");
-//        bread.setBestBefore("2022-09-30");
-//        bread.setLocation("Fridge");
-//        bread.setCost(3);
-//        bread.setCount(8);
-//
-//        wine.setName("wine");
-//        wine.setDescription("makes you drunk");
-//        wine.setBestBefore("2022-09-25");
-//        wine.setLocation("Pantry");
-//        wine.setCost(10);
-//        wine.setCount(1);
-
-        db = FirebaseFirestore.getInstance();
-        final CollectionReference collection = db.collection("Food Book");
-
         // This food book object will contain every info we need, so the activity won't look messy
         foodBook = new FoodBook();
-
-        // strictly for testing
-//        foodBook.addFood(bread);
-//        foodBook.addFood(wine);
 
         // foodList to pass around
         foodList = foodBook.getFoodList();
@@ -116,37 +90,9 @@ public class MainActivity extends AppCompatActivity {
         // set Adapter for the view
         foodListView.setAdapter(foodListAdapter);
 
-        // load data from database to app
-        collection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                // clear the old list
-                foodList.clear();
-                assert value != null;
-                for(QueryDocumentSnapshot document: value) {
-                    String name = document.getId();
-                    String description  = (String) document.getData().get("Description");
-                    String bestBefore = (String) document.getData().get("Best Before");
-                    String location = (String) document.getData().get("Location");
-                    String count = (String) document.getData().get("Count");
-                    String cost = (String) document.getData().get("Cost");
-                    Food food = new Food();
-                    food.setName(name);
-                    food.setDescription(description);
-                    food.setBestBefore(bestBefore);
-                    food.setLocation(location);
-                    assert count != null;
-                    food.setCount(Integer.valueOf(count));
-                    assert cost != null;
-                    food.setCost(Integer.valueOf(cost));
-                    foodBook.addFood(food);
-                }
-                foodList = foodBook.getFoodList();
-                foodListAdapter.notifyDataSetChanged();
-            }
-        });
+        db = FirebaseFirestore.getInstance();
 
-        Log.d("in onCreate", foodBook.toString());
+        this.update();
 
         // Set what happens when we click an Item in ListView
         foodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -187,5 +133,12 @@ public class MainActivity extends AppCompatActivity {
             activityResultLauncher.launch(intent);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void update() {
+        for(int i = 0; i < this.foodList.size(); i++) {
+            Food food = this.foodList.get(i);
+            db.collection("FoodBook").document(food.toString()).set(food);
+        }
     }
 }

@@ -146,10 +146,8 @@ public class AddEditActivity extends AppCompatActivity {
             }
 
             // Launch Intent
-            Log.d("in OK  button", foodBook.toString());
             intent.putExtra("foodBook", foodBook);
             this.setResult(1, intent);
-            Log.d("in add/edit", "executed");
             finish();
         }
         return super.onOptionsItemSelected(item);
