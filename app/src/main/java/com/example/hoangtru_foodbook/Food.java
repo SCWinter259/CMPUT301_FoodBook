@@ -12,6 +12,8 @@ public class Food implements Serializable{
     Integer count;
     Integer cost;
 
+    public Food() {}
+
     public String getName() {
         return this.name;
     }
